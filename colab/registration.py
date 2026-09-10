@@ -11,6 +11,7 @@ import httpx
 from colab.start_tunnel import _wait_for_url
 
 _DEFAULT_GATEWAY = "https://mcp.itaka.cc.cd"
+_DEFAULT_LOCAL_WORKER = "http://127.0.0.1:8001"
 _THREAD: threading.Thread | None = None
 _STOP = threading.Event()
 
@@ -41,11 +42,20 @@ def register_once(
         raise RuntimeError("GATEWAY_REGISTRATION_TOKEN is required")
 
     public_worker_url = worker_url or _wait_for_url()
+    local_worker_url = os.environ.get("LOCAL_WORKER_URL", _DEFAULT_LOCAL_WORKER).rstrip("/")
+    health_response = httpx.get(f"{local_worker_url}/health", timeout=10.0)
+    health_response.raise_for_status()
+    health = health_response.json()
+
+    capabilities = health.get("capabilities")
+    if not isinstance(capabilities, list) or not all(isinstance(item, str) for item in capabilities):
+        raise RuntimeError("worker /health returned invalid capabilities")
+
     payload = {
-        "worker_id": os.environ.get("WORKER_ID", socket.gethostname()),
+        "worker_id": health.get("worker_id") or os.environ.get("WORKER_ID", socket.gethostname()),
         "base_url": public_worker_url,
-        "worker_kind": os.environ.get("WORKER_KIND", "colab"),
-        "capabilities": ["hello", "health", "gpu_info"],
+        "worker_kind": health.get("worker_kind") or os.environ.get("WORKER_KIND", "colab"),
+        "capabilities": capabilities,
     }
     response = httpx.post(
         f"{gateway}/workers/register",
