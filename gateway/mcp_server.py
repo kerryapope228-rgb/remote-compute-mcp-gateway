@@ -3,10 +3,18 @@ from __future__ import annotations
 import os
 
 from mcp.server.fastmcp import FastMCP
+from mcp.server.transport_security import TransportSecuritySettings
 
 from gateway.tools import gpu_info as gateway_gpu_info
 from gateway.tools import health as gateway_health
 from gateway.tools import hello as gateway_hello
+
+
+_allowed_hosts = [
+    host.strip()
+    for host in os.environ.get("MCP_ALLOWED_HOSTS", "127.0.0.1:8000,localhost:8000").split(",")
+    if host.strip()
+]
 
 
 mcp = FastMCP(
@@ -21,6 +29,10 @@ mcp = FastMCP(
     streamable_http_path="/mcp",
     stateless_http=True,
     json_response=True,
+    transport_security=TransportSecuritySettings(
+        enable_dns_rebinding_protection=True,
+        allowed_hosts=_allowed_hosts,
+    ),
 )
 
 
