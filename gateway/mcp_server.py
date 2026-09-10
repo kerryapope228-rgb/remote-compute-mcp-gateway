@@ -5,6 +5,7 @@ import os
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
 
+from gateway.tools import gpu_benchmark as gateway_gpu_benchmark
 from gateway.tools import gpu_info as gateway_gpu_info
 from gateway.tools import health as gateway_health
 from gateway.tools import hello as gateway_hello
@@ -20,8 +21,8 @@ _allowed_hosts = [
 mcp = FastMCP(
     name="Remote Compute MCP Gateway",
     instructions=(
-        "Phase 1 isolated remote compute gateway. Only hello, health, and gpu_info "
-        "are exposed. Raw exec, shell, arbitrary command execution, and arbitrary "
+        "Isolated remote compute gateway. Only explicitly allowlisted operations are exposed, "
+        "including a bounded GPU benchmark. Raw exec, shell, arbitrary command execution, and arbitrary "
         "code execution are intentionally unavailable."
     ),
     host=os.environ.get("MCP_HOST", "127.0.0.1"),
@@ -52,6 +53,12 @@ def health() -> dict:
 def gpu_info() -> dict:
     """Return the remote Worker's GPU information without exposing shell access."""
     return gateway_gpu_info()
+
+
+@mcp.tool()
+def gpu_benchmark(matrix_size: int = 2048, iterations: int = 5) -> dict:
+    """Run a bounded float32 CUDA matrix benchmark. matrix_size: 256-4096; iterations: 1-20."""
+    return gateway_gpu_benchmark(matrix_size=matrix_size, iterations=iterations)
 
 
 def main() -> None:

@@ -3,7 +3,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field
 
 
-AllowedOperation = Literal["hello", "health", "gpu_info"]
+AllowedOperation = Literal["hello", "health", "gpu_info", "gpu_benchmark"]
 
 
 class WorkerRequest(BaseModel):

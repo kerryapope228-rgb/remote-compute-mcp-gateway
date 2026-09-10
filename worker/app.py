@@ -26,7 +26,7 @@ def health() -> dict[str, Any]:
         "hostname": socket.gethostname(),
         "python": platform.python_version(),
         "uptime_seconds": round(time.time() - STARTED_AT, 3),
-        "capabilities": ["hello", "health", "gpu_info"],
+        "capabilities": ["hello", "health", "gpu_info", "gpu_benchmark"],
     }
 
 
@@ -35,7 +35,7 @@ def registration() -> dict[str, Any]:
     return {
         "worker_id": WORKER_ID,
         "worker_kind": WORKER_KIND,
-        "capabilities": ["hello", "health", "gpu_info"],
+        "capabilities": ["hello", "health", "gpu_info", "gpu_benchmark"],
         "protocol_version": "1",
     }
 

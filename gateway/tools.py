@@ -31,3 +31,10 @@ def health() -> dict:
 
 def gpu_info() -> dict:
     return call_tool("gpu_info")
+
+
+def gpu_benchmark(matrix_size: int = 2048, iterations: int = 5) -> dict:
+    return call_tool(
+        "gpu_benchmark",
+        {"matrix_size": matrix_size, "iterations": iterations},
+    )

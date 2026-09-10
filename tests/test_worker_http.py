@@ -10,7 +10,7 @@ def test_worker_registration_is_whitelisted():
     response = client.get("/registration")
     assert response.status_code == 200
     data = response.json()
-    assert data["capabilities"] == ["hello", "health", "gpu_info"]
+    assert data["capabilities"] == ["hello", "health", "gpu_info", "gpu_benchmark"]
     assert data["protocol_version"] == "1"
 
 
@@ -27,6 +27,20 @@ def test_worker_invoke_hello():
     )
     assert response.status_code == 200
     assert response.json()["ok"] is True
+
+
+def test_worker_gpu_benchmark_rejects_out_of_bounds_input():
+    response = client.post(
+        "/invoke",
+        json={
+            "request_id": "bench-invalid",
+            "operation": "gpu_benchmark",
+            "payload": {"matrix_size": 99999, "iterations": 1},
+        },
+    )
+    assert response.status_code == 200
+    assert response.json()["ok"] is False
+    assert "matrix_size" in response.json()["error"]
 
 
 def test_worker_rejects_exec_at_schema_boundary():
