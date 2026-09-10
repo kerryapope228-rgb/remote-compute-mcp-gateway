@@ -7,9 +7,6 @@ from gateway.worker_client import build_worker_client
 from shared.protocol import WorkerRequest
 
 
-_worker = build_worker_client()
-
-
 def call_tool(operation: str, payload: dict | None = None) -> dict:
     ensure_operation_allowed(operation)
     request = WorkerRequest(
@@ -17,7 +14,8 @@ def call_tool(operation: str, payload: dict | None = None) -> dict:
         operation=operation,
         payload=payload or {},
     )
-    response = _worker.call(request)
+    worker = build_worker_client()
+    response = worker.call(request)
     if not response.ok:
         raise RuntimeError(response.error or "worker call failed")
     return response.result or {}

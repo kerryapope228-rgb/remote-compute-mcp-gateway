@@ -3,6 +3,7 @@ from __future__ import annotations
 import httpx
 
 from gateway.config import worker_base_url
+from gateway.registry import read_lease
 from shared.protocol import WorkerRequest, WorkerResponse
 from worker.colab_worker import handle_request
 
@@ -47,6 +48,10 @@ class RemoteWorkerClient:
 
 
 def build_worker_client():
+    lease = read_lease()
+    if lease:
+        return RemoteWorkerClient(lease.base_url)
+
     worker_url = worker_base_url()
     if worker_url:
         return RemoteWorkerClient(worker_url)

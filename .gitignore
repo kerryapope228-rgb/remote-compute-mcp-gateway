@@ -7,4 +7,6 @@ venv/
 .env
 .env.*
 config.local.json
+worker-registry.json
+NUL
 .DS_Store
