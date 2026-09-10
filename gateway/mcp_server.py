@@ -12,7 +12,7 @@ from gateway.tools import hello as gateway_hello
 
 _allowed_hosts = [
     host.strip()
-    for host in os.environ.get("MCP_ALLOWED_HOSTS", "127.0.0.1:8000,localhost:8000").split(",")
+    for host in os.environ.get("MCP_ALLOWED_HOSTS", "127.0.0.1:8000,localhost:8000,mcp.itaka.cc.cd").split(",")
     if host.strip()
 ]
 

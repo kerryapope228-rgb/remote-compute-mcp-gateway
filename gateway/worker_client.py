@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-import os
-
 import httpx
 
+from gateway.config import worker_base_url
 from shared.protocol import WorkerRequest, WorkerResponse
 from worker.colab_worker import handle_request
 
@@ -48,7 +47,7 @@ class RemoteWorkerClient:
 
 
 def build_worker_client():
-    worker_url = os.environ.get("WORKER_BASE_URL")
+    worker_url = worker_base_url()
     if worker_url:
         return RemoteWorkerClient(worker_url)
     return LocalWorkerClient()
