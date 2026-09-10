@@ -10,6 +10,7 @@ from starlette.responses import JSONResponse
 from starlette.routing import Route
 
 from gateway.mcp_server import mcp
+from gateway.policy import ALLOWED_OPERATIONS
 from gateway.registry import WorkerRegistration, registration_token, write_lease
 
 
@@ -31,8 +32,7 @@ async def register_worker(request: Request) -> JSONResponse:
     except (ValidationError, ValueError) as exc:
         return JSONResponse({"detail": str(exc)}, status_code=422)
 
-    allowed = {"hello", "health", "gpu_info"}
-    if not set(registration.capabilities).issubset(allowed):
+    if not set(registration.capabilities).issubset(ALLOWED_OPERATIONS):
         return JSONResponse({"detail": "unsupported worker capabilities"}, status_code=422)
 
     lease = write_lease(registration)
